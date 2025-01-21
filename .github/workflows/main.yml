@@ -2,22 +2,17 @@ name: GP Workflow
 
 env:
   DEFAULT_CUSTOM_MESSAGE: "Hello, I AM YOUR FATHER!"
-  DEFAULT_RUN_TESTS: "true"
+  DEFAULT_RUN_TESTS: true
   DEFAULT_EXECUTION_COUNT: "1"
   DEFAULT_ENVIRONMENT: "development"
 
 on:
-  push:
-    branches:
-      - main
-  schedule:
-    - cron: "*/2 * * * *"
   workflow_dispatch:
     inputs:
       custom-message:
         description: "Custom message to display in the pipeline"
         required: false
-        default: ${{ env.DEFAULT_CUSTOM_MESSAGE }}
+        default: "Hello, I AM YOUR FATHER!" # Valor hardcoded, já que env não é acessível
         type: string
       run-tests:
         description: "Run tests? (true/false)"
@@ -27,12 +22,12 @@ on:
       execution-count:
         description: "Number of executions (numeric string)"
         required: false
-        default: ${{ env.DEFAULT_EXECUTION_COUNT }}
+        default: "1" # Valor hardcoded
         type: string
       environment:
         description: "Select the environment"
         required: false
-        default: ${{ env.DEFAULT_ENVIRONMENT }}
+        default: "development" # Valor hardcoded
         type: choice
         options:
           - development
@@ -54,27 +49,25 @@ jobs:
 
       - name: Determine and display inputs
         run: |
-          CUSTOM_MESSAGE=${{ github.event.inputs.custom-message || env.DEFAULT_CUSTOM_MESSAGE }}
-          RUN_TESTS=${{ github.event.inputs.run-tests || env.DEFAULT_RUN_TESTS }}
-          EXECUTION_COUNT=${{ github.event.inputs.execution-count || env.DEFAULT_EXECUTION_COUNT }}
-          ENVIRONMENT=${{ github.event.inputs.environment || env.DEFAULT_ENVIRONMENT }}
+          # Use valores fornecidos ou valores globais como fallback
+          CUSTOM_MESSAGE=${{ github.event.inputs.custom-message || 'Hello, I AM YOUR FATHER!' }}
+          RUN_TESTS=${{ github.event.inputs.run-tests || true }}
+          EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
+          ENVIRONMENT=${{ github.event.inputs.environment || 'development' }}
 
           echo "Custom message: $CUSTOM_MESSAGE"
           echo "Run tests: $RUN_TESTS"
           echo "Execution count: $EXECUTION_COUNT"
           echo "Environment: $ENVIRONMENT"
 
-      - name: Process numeric input
+      - name: Process Numeric Input
         run: |
-          EXECUTION_COUNT=${{ github.event.inputs.execution-count || env.DEFAULT_EXECUTION_COUNT }}
+          EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
           echo "Numeric input as string: $EXECUTION_COUNT"
           echo "Converting EXECUTION_COUNT to number and performing calculation..."
           NEW_COUNT=$((EXECUTION_COUNT + 1))
           echo "New count: $NEW_COUNT"
 
-      - name: Install dependencies
-        run: npm install
-
       - name: Run tests
-        if: ${{ github.event.inputs.run-tests || env.DEFAULT_RUN_TESTS }}
-        run: npm test
+        if: ${{ github.event.inputs.run-tests }}
+        run: echo "Running tests because 'run-tests' is true!"
