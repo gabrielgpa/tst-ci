@@ -46,24 +46,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Display inputs
+      - name: Determine and display inputs
         run: |
-          echo "Custom message: ${{ github.event.inputs.custom-message }}"
-          echo "Run tests: ${{ github.event.inputs.run-tests }}"
-          echo "Execution count: ${{ github.event.inputs.execution-count }}"
-          echo "Environment: ${{ github.event.inputs.environment }}"
+          CUSTOM_MESSAGE=${{ github.event.inputs.custom-message || 'Hello, I AM YOUR FATHER!' }}
+          RUN_TESTS=${{ github.event.inputs.run-tests || true }}
+          EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
+          ENVIRONMENT=${{ github.event.inputs.environment || 'development' }}
+
+          echo "Custom message: $CUSTOM_MESSAGE"
+          echo "Run tests: $RUN_TESTS"
+          echo "Execution count: $EXECUTION_COUNT"
+          echo "Environment: $ENVIRONMENT"
 
       - name: Process numeric input
         run: |
-          COUNT=${{ github.event.inputs.execution-count }}
-          echo "Numeric input as string: $COUNT"
-          echo "Converting COUNT to number and performing calculation..."
-          NEW_COUNT=$((COUNT + 1))
+          EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
+          echo "Numeric input as string: $EXECUTION_COUNT"
+          echo "Converting EXECUTION_COUNT to number and performing calculation..."
+          NEW_COUNT=$((EXECUTION_COUNT + 1))
           echo "New count: $NEW_COUNT"
 
       - name: Install dependencies
         run: npm install
 
       - name: Run tests
-        if: ${{ github.event.inputs.run-tests }}
+        if: ${{ github.event.inputs.run-tests || true }}
         run: npm test
