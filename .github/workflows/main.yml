@@ -16,6 +16,7 @@ on:
     inputs:
       custom-message:
         description: "Custom message to display in the pipeline"
+        default: "Hello, I AM YOUR FATHER!"
         required: false
         type: string
       run-tests:
@@ -25,6 +26,7 @@ on:
         type: boolean
       execution-count:
         description: "Number of executions (numeric string)"
+        default: "1"
         required: false
         type: string
       environment:
