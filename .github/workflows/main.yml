@@ -7,6 +7,11 @@ env:
   DEFAULT_ENVIRONMENT: "development"
 
 on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "*/2 * * * *"
   workflow_dispatch:
     inputs:
       custom-message:
