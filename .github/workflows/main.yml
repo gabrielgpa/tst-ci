@@ -12,7 +12,6 @@ on:
       custom-message:
         description: "Custom message to display in the pipeline"
         required: false
-        default: "Hello, I AM YOUR FATHER!" # Valor hardcoded, já que env não é acessível
         type: string
       run-tests:
         description: "Run tests? (true/false)"
@@ -22,12 +21,10 @@ on:
       execution-count:
         description: "Number of executions (numeric string)"
         required: false
-        default: "1" # Valor hardcoded
         type: string
       environment:
         description: "Select the environment"
         required: false
-        default: "development" # Valor hardcoded
         type: choice
         options:
           - development
@@ -49,7 +46,6 @@ jobs:
 
       - name: Determine and display inputs
         run: |
-          # Use valores fornecidos ou valores globais como fallback
           CUSTOM_MESSAGE=${{ github.event.inputs.custom-message || 'Hello, I AM YOUR FATHER!' }}
           RUN_TESTS=${{ github.event.inputs.run-tests || true }}
           EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
