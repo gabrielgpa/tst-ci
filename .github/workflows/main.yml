@@ -12,14 +12,17 @@ on:
         description: "Custom message to display in the pipeline"
         required: true
         default: "Hello, I AM YOUR FATHER!"
+        type: string
       run-tests:
         description: "Run tests? (true/false)"
         required: true
-        default: "true"
+        default: true
+        type: boolean
       execution-count:
         description: "Number of executions (numeric string)"
         required: true
         default: "1"
+        type: string
       environment:
         description: "Select the environment"
         required: true
