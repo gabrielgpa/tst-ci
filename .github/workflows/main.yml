@@ -11,7 +11,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: "*/2 * * * *"
+    - cron: "*/6 * * * *"
   workflow_dispatch:
     inputs:
       custom-message:
