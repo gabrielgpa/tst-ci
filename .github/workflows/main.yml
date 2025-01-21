@@ -48,10 +48,10 @@ jobs:
 
       - name: Determine and display inputs
         run: |
-          CUSTOM_MESSAGE="${{ github.event.inputs.custom-message || 'Hello, I AM YOUR FATHER!' }}"
-          RUN_TESTS="${{ github.event.inputs.run-tests || true }}"
-          EXECUTION_COUNT="${{ github.event.inputs.execution-count || '1' }}"
-          ENVIRONMENT="${{ github.event.inputs.environment || 'development' }}"
+          CUSTOM_MESSAGE=${{ github.event.inputs.custom-message || github.workflow_dispatch.inputs.custom-message.default }}
+          RUN_TESTS=${{ github.event.inputs.run-tests || github.workflow_dispatch.inputs.run-tests.default }}
+          EXECUTION_COUNT=${{ github.event.inputs.execution-count || github.workflow_dispatch.inputs.execution-count.default }}
+          ENVIRONMENT=${{ github.event.inputs.environment || github.workflow_dispatch.inputs.environment.default }}
 
           echo "Custom message: $CUSTOM_MESSAGE"
           echo "Run tests: $RUN_TESTS"
@@ -60,7 +60,7 @@ jobs:
 
       - name: Process numeric input
         run: |
-          EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
+          EXECUTION_COUNT=${{ github.event.inputs.execution-count || github.workflow_dispatch.inputs.execution-count.default }}
           echo "Numeric input as string: $EXECUTION_COUNT"
           echo "Converting EXECUTION_COUNT to number and performing calculation..."
           NEW_COUNT=$((EXECUTION_COUNT + 1))
@@ -70,5 +70,5 @@ jobs:
         run: npm install
 
       - name: Run tests
-        if: ${{ github.event.inputs.run-tests || true }}
+        if: ${{ github.event.inputs.run-tests || github.workflow_dispatch.inputs.run-tests.default }}
         run: npm test
