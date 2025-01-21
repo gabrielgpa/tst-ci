@@ -48,10 +48,10 @@ jobs:
 
       - name: Determine and display inputs
         run: |
-          CUSTOM_MESSAGE=${{ github.event.inputs.custom-message || 'Hello, I AM YOUR FATHER!' }}
-          RUN_TESTS=${{ github.event.inputs.run-tests || true }}
-          EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
-          ENVIRONMENT=${{ github.event.inputs.environment || 'development' }}
+          CUSTOM_MESSAGE="${{ github.event.inputs.custom-message || 'Hello, I AM YOUR FATHER!' }}"
+          RUN_TESTS="${{ github.event.inputs.run-tests || true }}"
+          EXECUTION_COUNT="${{ github.event.inputs.execution-count || '1' }}"
+          ENVIRONMENT="${{ github.event.inputs.environment || 'development' }}"
 
           echo "Custom message: $CUSTOM_MESSAGE"
           echo "Run tests: $RUN_TESTS"
