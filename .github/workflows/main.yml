@@ -65,5 +65,5 @@ jobs:
         run: npm install
 
       - name: Run tests
-        if: ${{ github.event.inputs.run-tests == 'true' }}
+        if: ${{ github.event.inputs.run-tests }}
         run: npm test
