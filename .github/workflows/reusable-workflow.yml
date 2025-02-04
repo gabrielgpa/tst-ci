@@ -1,0 +1,21 @@
+name: Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      MY_SECRET:
+        required: true
+
+jobs:
+  example_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show environment
+        run: echo "Environment: ${{ inputs.environment }}"
+        
+      - name: Use secret
+        run: echo "The secret is ${{ secrets.MY_SECRET }}"  # Nunca faça isso em um caso real!
