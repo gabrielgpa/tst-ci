@@ -21,3 +21,5 @@ jobs:
         run: |
           echo "Using the secret safely..."
           echo "${{ secrets.MY_SECRET }}" > /dev/null
+          echo "The secret is ${{ secrets.MY_SECRET }}"  # Nunca faça isso em um caso real!
+
