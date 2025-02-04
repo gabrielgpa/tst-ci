@@ -39,6 +39,14 @@ on:
           - production
 
 jobs:
+
+  call-reusable:
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      environment: production
+    secrets:
+      MY_SECRET: ${{ secrets.MY_SECRET }}
+      
   build-and-test:
     runs-on: ubuntu-latest
 
@@ -62,7 +70,6 @@ jobs:
           echo "Run tests: $RUN_TESTS"
           echo "Execution count: $EXECUTION_COUNT"
           echo "Environment: $ENVIRONMENT"
-          echo "MY_SEC: ${{ secrets.MY_SEC }}"
 
       - name: Process Numeric Input
         run: |
