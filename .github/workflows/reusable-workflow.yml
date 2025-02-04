@@ -15,7 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Show environment
-        run: echo "Environment: ${{ inputs.environment }}"
-        
-      - name: Use secret
-        run: echo "The secret is ${{ secrets.MY_SECRET }}"  # Nunca faça isso em um caso real!
+        run: echo "Environment:${{ inputs.environment }}"
+
+      - name: Use secret safely
+        run: |
+          echo "Using the secret safely..."
+          echo "${{ secrets.MY_SECRET }}" > /dev/null
