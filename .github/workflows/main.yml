@@ -79,6 +79,10 @@ jobs:
           NEW_COUNT=$((EXECUTION_COUNT + 1))
           echo "New count: $NEW_COUNT"
 
+      - name: Test
+        run: |
+          echo $NEW_COUNT
+
       - name: Run tests
         if: ${{ github.event.inputs.run-tests }}
         run: echo "Running tests because 'run-tests' is true!"
