@@ -46,5 +46,6 @@ jobs:
         env:
           repo_source: gabrielgpa/go-me
           branch_source: main
+          ecosystem: github_actions
           GH_USER: gabrielgpa
           GH_PASS: ${{ secrets.GH_PASS }}

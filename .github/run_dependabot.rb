@@ -11,6 +11,7 @@ require "pp"
 
 repo_name = ENV["repo_source"]
 repo_branch = ENV["branch_source"]
+ecosystem = ENV["ecosystem"]
 
 source = Dependabot::Source.new(
   provider: "github",
@@ -26,7 +27,7 @@ credentials = [{
   "password" => ENV["GH_PASS"]
 }]
 
-package_manager = "github_actions"
+package_manager = ecosystem
 
 fetcher = Dependabot::FileFetchers.for_package_manager(package_manager).new(
   source: source,
@@ -43,28 +44,39 @@ parser = Dependabot::FileParsers.for_package_manager(package_manager).new(
 files.each { |f| puts "- #{f.name}" }
 
 dependencies = parser.parse
-puts "Dependencies found: #{ dependencies.count }"
+puts "Dependencies found: #{dependencies.count}"
+
+# Helper para extrair versão ou ref
+def requirement_string(dep)
+  req = dep.requirements&.first
+  return nil if req.nil?
+
+  req[:requirement] || req.dig(:source, :ref) || "N/A"
+end
 
 dependencies.each do |dep|
   puts "=========="
-  pp dep
+  puts "📦 #{dep.name}"
+  puts "  📌 Version: #{dep.version}"
+  puts "  📄 File: #{dep.requirements&.first&.dig(:file) || 'N/A'}"
+  puts "  🔖 Declared as: #{requirement_string(dep)}"
 end
 
 if dependencies.respond_to?(:each)
   dependencies.each do |dep|
     puts "Checking #{dep.name}..."
-  
-    if dep.requirements.nil? || dep.requirements.empty? || dep.requirements.any? { |r| r[:requirement].nil? }
-      puts "Skipping #{dep.name} due to missing version (requirement)"
+
+    if dep.requirements.nil? || dep.requirements.empty? || dep.requirements.any? { |r| r[:requirement].nil? && r.dig(:source, :ref).nil? }
+      puts "Skipping #{dep.name} due to missing version (requirement/ref)"
       next
     end
-  
+
     checker = Dependabot::UpdateCheckers.for_package_manager(package_manager).new(
       dependency: dep,
       dependency_files: files,
       credentials: credentials
     )
-  
+
     can_update =
       if checker.respond_to?(:updatable?)
         checker.updatable?
@@ -73,26 +85,29 @@ if dependencies.respond_to?(:each)
       else
         false
       end
-  
-    next unless can_update
-  
+
+    unless can_update
+      puts "No updates available for #{dep.name}"
+      next
+    end
+
     puts "Updating #{dep.name}"
-  
+
     update_files = Dependabot::FileUpdaters.for_package_manager(package_manager).new(
       dependencies: [dep],
       dependency_files: files,
       credentials: credentials
     ).updated_dependency_files
-  
+
     Dependabot::PullRequestCreator.new(
       source: source,
       base_commit: fetcher.commit,
       dependencies: [dep],
       files: update_files,
       credentials: credentials,
-      pr_message: "Bump #{ dep.name } to #{ dep.version }"
+      pr_message: "Bump #{dep.name} to #{dep.version}"
     ).create
-  end  
+  end
 else
   puts "No dependencies found"
 end
