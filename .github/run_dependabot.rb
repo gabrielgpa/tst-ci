@@ -35,6 +35,8 @@ fetcher = Dependabot::FileFetchers.for_package_manager(package_manager).new(
 )
 
 files = fetcher.files
+commit = fetcher.commit
+
 parser = Dependabot::FileParsers.for_package_manager(package_manager).new(
   dependency_files: files,
   source: source,
@@ -63,7 +65,7 @@ dependencies.each do |dep|
 end
 
 if dependencies.respond_to?(:each)
-  dependencies.each do |dep|
+  ddependencies.select(&:top_level?).each do |dep|
     puts "Checking #{dep.name}..."
   
     # Se não há requirements ou se qualquer requirement estiver nil => SKIP
@@ -81,37 +83,63 @@ if dependencies.respond_to?(:each)
     )
   
     # Verifica se pode atualizar
-    can_update =
-      if checker.respond_to?(:updatable?)
-        checker.updatable?
-      elsif checker.respond_to?(:can_update?)
-        checker.can_update?(requirements_to_unlock: :own)
-      else
-        false
+    # can_update =
+    #   if checker.respond_to?(:updatable?)
+    #     checker.updatable?
+    #   elsif checker.respond_to?(:can_update?)
+    #     checker.can_update?(requirements_to_unlock: :own)
+    #   else
+    #     false
+    #   end
+  
+    # unless can_update
+    #   puts "No updates available for #{dep.name}"
+    #   next
+    # end
+
+    next if checker.up_to_date?
+
+    requirements_to_unlock =
+      if !checker.requirements_unlocked_or_can_be?
+        if checker.can_update?(requirements_to_unlock: :none) then :none
+        else :update_not_possible
+        end
+      elsif checker.can_update?(requirements_to_unlock: :own) then :own
+      elsif checker.can_update?(requirements_to_unlock: :all) then :all
+      else :update_not_possible
       end
   
-    unless can_update
-      puts "No updates available for #{dep.name}"
-      next
-    end
-  
+    next if requirements_to_unlock == :update_not_possible
+
     puts "Updating #{dep.name}"
+    updated_deps = checker.updated_dependencies(
+      requirements_to_unlock: requirements_to_unlock
+    )
   
-    # Só chamamos FileUpdaters agora, com requirement garantido
+    print "  - Updating #{dep.name} (from #{dep.version})…"
     update_files = Dependabot::FileUpdaters.for_package_manager(package_manager).new(
-      dependencies: [dep],
+      dependencies: updated_deps,
       dependency_files: files,
       credentials: credentials
-    ).updated_dependency_files
+    )
+
+    updated_files = update_files.updated_dependency_files
   
-    Dependabot::PullRequestCreator.new(
+    pr_creator = Dependabot::PullRequestCreator.new(
       source: source,
-      base_commit: fetcher.commit,
-      dependencies: [dep],
-      files: update_files,
+      base_commit: commit,
+      dependencies: updated_deps,
+      files: updated_files,
       credentials: credentials,
       pr_message: "Bump #{dep.name} to #{dep.version}"
-    ).create
+      author_details: { name: "Dependabot", email: "no-reply@github.com" },
+      label_language: true
+    )
+
+    pull_request = pr_creator.create
+    puts " submitted"
+
+    next unless pull_request
   end
   
 else
