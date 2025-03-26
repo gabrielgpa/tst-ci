@@ -48,8 +48,8 @@ if dependencies.respond_to?(:each)
   dependencies.each do |dep|
     puts "Checking #{dep.name}..."
   
-    if dep.requirements.nil? || !dep.requirements.is_a?(Array) || dep.requirements.empty?
-      puts "No valid requirements for #{dep.name}, skipping."
+    if dep.requirements.nil? || dep.requirements.empty? || dep.requirements.any? { |r| r[:requirement].nil? }
+      puts "Skipping #{dep.name} due to missing version (requirement)"
       next
     end
   
