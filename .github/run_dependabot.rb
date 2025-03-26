@@ -65,7 +65,7 @@ dependencies.each do |dep|
 end
 
 if dependencies.respond_to?(:each)
-  ddependencies.select(&:top_level?).each do |dep|
+  dependencies.select(&:top_level?).each do |dep|
     puts "Checking #{dep.name}..."
   
     # Se não há requirements ou se qualquer requirement estiver nil => SKIP
