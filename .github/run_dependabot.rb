@@ -131,7 +131,7 @@ if dependencies.respond_to?(:each)
       dependencies: updated_deps,
       files: updated_files,
       credentials: credentials,
-      pr_message: "Bump #{dep.name} to #{dep.version}"
+      pr_message: "Bump #{dep.name} to #{dep.version}",
       author_details: { name: "Dependabot", email: "no-reply@github.com" },
       label_language: true
     )
