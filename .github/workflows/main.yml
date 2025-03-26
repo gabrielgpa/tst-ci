@@ -51,38 +51,56 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Ruby env
+        uses: ruby/setup-ruby@v1
         with:
-          node-version: 'node'
+          ruby-version: '3.3'
+          bundler-cache: true
 
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Repository checkout
+        uses: actions/checkout@v2
 
-      - name: Determine and display inputs
+      - name: Run dynamic dependabot
         run: |
-          CUSTOM_MESSAGE="${{ github.event.inputs.custom-message || 'Hello, I AM YOUR FATHER!' }}"
-          RUN_TESTS=${{ github.event.inputs.run-tests || true }}
-          EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
-          ENVIRONMENT=${{ github.event.inputs.environment || 'development' }}
+          bundle exec ruby .github/run_dependabot.rb
+        env:
+          repo_source: gabrielgpa/go-me
+          branch_source: main
+          GH_USER: gabrielgpa
+          GH_PASS: ${{ secrets.GH_PASS }}
+          
+      # - name: Set up Node.js
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 'node'
 
-          echo "Custom message: $CUSTOM_MESSAGE"
-          echo "Run tests: $RUN_TESTS"
-          echo "Execution count: $EXECUTION_COUNT"
-          echo "Environment: $ENVIRONMENT"
+      # - name: Checkout code
+      #   uses: actions/checkout@v3
 
-      - name: Process Numeric Input
-        run: |
-          EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
-          echo "Numeric input as string: $EXECUTION_COUNT"
-          echo "Converting EXECUTION_COUNT to number and performing calculation..."
-          NEW_COUNT=$((EXECUTION_COUNT + 1))
-          echo "New count: $NEW_COUNT"
+      # - name: Determine and display inputs
+      #   run: |
+      #     CUSTOM_MESSAGE="${{ github.event.inputs.custom-message || 'Hello, I AM YOUR FATHER!' }}"
+      #     RUN_TESTS=${{ github.event.inputs.run-tests || true }}
+      #     EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
+      #     ENVIRONMENT=${{ github.event.inputs.environment || 'development' }}
 
-      - name: Test
-        run: |
-          echo $NEW_COUNT
+      #     echo "Custom message: $CUSTOM_MESSAGE"
+      #     echo "Run tests: $RUN_TESTS"
+      #     echo "Execution count: $EXECUTION_COUNT"
+      #     echo "Environment: $ENVIRONMENT"
 
-      - name: Run tests
-        if: ${{ github.event.inputs.run-tests }}
-        run: echo "Running tests because 'run-tests' is true!"
+      # - name: Process Numeric Input
+      #   run: |
+      #     EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
+      #     echo "Numeric input as string: $EXECUTION_COUNT"
+      #     echo "Converting EXECUTION_COUNT to number and performing calculation..."
+      #     NEW_COUNT=$((EXECUTION_COUNT + 1))
+      #     echo "New count: $NEW_COUNT"
+
+      # - name: Test
+      #   run: |
+      #     echo $NEW_COUNT
+
+      # - name: Run tests
+      #   if: ${{ github.event.inputs.run-tests }}
+      #   run: echo "Running tests because 'run-tests' is true!"
