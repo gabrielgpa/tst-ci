@@ -6,6 +6,7 @@ require "dependabot/update_checkers"
 require "dependabot/file_updaters"
 require "dependabot/pull_request_creator"
 require "dependabot/source"
+require "dependabot/npm_and_yarn"
 
 repo_name = ENV["repo_source"]
 repo_branch = ENV["branch_source"]
@@ -24,7 +25,7 @@ credentials = [{
   "password" => ENV["GH_PASS"]
 }]
 
-package_manager = "github_actions"
+package_manager = "npm_and_yarn"
 
 fetcher = Dependabot::FileFetchers.for_package_manager(package_manager).new(
   source: source,
