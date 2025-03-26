@@ -65,18 +65,27 @@ end
 if dependencies.respond_to?(:each)
   dependencies.each do |dep|
     puts "Checking #{dep.name}..."
-
-    if dep.requirements.nil? || dep.requirements.empty? || dep.requirements.any? { |r| r[:requirement].nil? && r.dig(:source, :ref).nil? }
-      puts "Skipping #{dep.name} due to missing version (requirement/ref)"
+  
+    if dep.requirements.nil? || dep.requirements.empty?
+      puts "Skipping #{dep.name} - no requirements"
       next
     end
-
+  
+    first_req = dep.requirements.first
+    requirement = first_req[:requirement]
+    ref = first_req.dig(:source, :ref)
+  
+    if requirement.nil? && ref.nil?
+      puts "Skipping #{dep.name} - neither requirement nor ref is present"
+      next
+    end
+  
     checker = Dependabot::UpdateCheckers.for_package_manager(package_manager).new(
       dependency: dep,
       dependency_files: files,
       credentials: credentials
     )
-
+  
     can_update =
       if checker.respond_to?(:updatable?)
         checker.updatable?
@@ -85,20 +94,20 @@ if dependencies.respond_to?(:each)
       else
         false
       end
-
+  
     unless can_update
       puts "No updates available for #{dep.name}"
       next
     end
-
+  
     puts "Updating #{dep.name}"
-
+  
     update_files = Dependabot::FileUpdaters.for_package_manager(package_manager).new(
       dependencies: [dep],
       dependency_files: files,
       credentials: credentials
     ).updated_dependency_files
-
+  
     Dependabot::PullRequestCreator.new(
       source: source,
       base_commit: fetcher.commit,
