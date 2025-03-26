@@ -7,6 +7,7 @@ require "dependabot/file_updaters"
 require "dependabot/pull_request_creator"
 require "dependabot/source"
 require "dependabot/npm_and_yarn"
+require "pp"
 
 repo_name = ENV["repo_source"]
 repo_branch = ENV["branch_source"]
@@ -43,6 +44,11 @@ files.each { |f| puts "- #{f.name}" }
 
 dependencies = parser.parse
 puts "Dependencies found: #{ dependencies.count }"
+
+dependencies.each do |dep|
+  puts "=========="
+  pp dep
+end
 
 if dependencies.respond_to?(:each)
   dependencies.each do |dep|
