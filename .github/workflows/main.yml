@@ -60,6 +60,9 @@ jobs:
       - name: Repository checkout
         uses: actions/checkout@v2
 
+      - name: Install Gemfile dependencies
+        run: bundle install
+
       - name: Run dynamic dependabot
         run: |
           bundle exec ruby .github/run_dependabot.rb
