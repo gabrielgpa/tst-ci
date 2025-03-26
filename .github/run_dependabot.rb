@@ -46,29 +46,38 @@ puts "Dependencies found: #{ dependencies.count }"
 
 if dependencies.respond_to?(:each)
   dependencies.each do |dep|
-    if dep.requirements.nil? || !dep.requirements.is_a?(Array)
-      puts "No requirements found for #{ dep.name }"
+    puts "Checking #{dep.name}..."
+  
+    if dep.requirements.nil? || !dep.requirements.is_a?(Array) || dep.requirements.empty?
+      puts "No valid requirements for #{dep.name}, skipping."
       next
     end
-
-    puts "Checker for #{ dep.name }"
+  
     checker = Dependabot::UpdateCheckers.for_package_manager(package_manager).new(
       dependency: dep,
       dependency_files: files,
-      credentials: credentials 
+      credentials: credentials
     )
-
-    can_update = checker.respond_to?(:updatable?) ? checker.updatable? : checker.can_update?(requirements_to_unlock: :own)
+  
+    can_update =
+      if checker.respond_to?(:updatable?)
+        checker.updatable?
+      elsif checker.respond_to?(:can_update?)
+        checker.can_update?(requirements_to_unlock: :own)
+      else
+        false
+      end
+  
     next unless can_update
-
-    puts "Check update dependencies for #{ dep.name }"
+  
+    puts "Updating #{dep.name}"
+  
     update_files = Dependabot::FileUpdaters.for_package_manager(package_manager).new(
       dependencies: [dep],
       dependency_files: files,
       credentials: credentials
     ).updated_dependency_files
-
-    puts "Create a PR for #{ dep.name }"
+  
     Dependabot::PullRequestCreator.new(
       source: source,
       base_commit: fetcher.commit,
@@ -77,7 +86,7 @@ if dependencies.respond_to?(:each)
       credentials: credentials,
       pr_message: "Bump #{ dep.name } to #{ dep.version }"
     ).create
-  end
+  end  
 else
   puts "No dependencies found"
 end
