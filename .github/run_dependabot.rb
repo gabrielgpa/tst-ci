@@ -25,7 +25,7 @@ credentials = [{
   "password" => ENV["GH_PASS"]
 }]
 
-package_manager = "npm_and_yarn"
+package_manager = "github_actions"
 
 fetcher = Dependabot::FileFetchers.for_package_manager(package_manager).new(
   source: source,

@@ -14,30 +14,6 @@ on:
   # schedule:
   #   - cron: "0 */2 * * *"
   workflow_dispatch:
-    inputs:
-      custom-message:
-        description: "Custom message to display in the pipeline"
-        default: "Hello, I AM YOUR FATHER!"
-        required: false
-        type: string
-      run-tests:
-        description: "Run tests? (true/false)"
-        required: false
-        default: true
-        type: boolean
-      execution-count:
-        description: "Number of executions (numeric string)"
-        default: "1"
-        required: false
-        type: string
-      environment:
-        description: "Select the environment"
-        required: false
-        type: choice
-        options:
-          - development
-          - staging
-          - production
 
 jobs:
 
@@ -72,39 +48,3 @@ jobs:
           branch_source: main
           GH_USER: gabrielgpa
           GH_PASS: ${{ secrets.GH_PASS }}
-          
-      # - name: Set up Node.js
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 'node'
-
-      # - name: Checkout code
-      #   uses: actions/checkout@v3
-
-      # - name: Determine and display inputs
-      #   run: |
-      #     CUSTOM_MESSAGE="${{ github.event.inputs.custom-message || 'Hello, I AM YOUR FATHER!' }}"
-      #     RUN_TESTS=${{ github.event.inputs.run-tests || true }}
-      #     EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
-      #     ENVIRONMENT=${{ github.event.inputs.environment || 'development' }}
-
-      #     echo "Custom message: $CUSTOM_MESSAGE"
-      #     echo "Run tests: $RUN_TESTS"
-      #     echo "Execution count: $EXECUTION_COUNT"
-      #     echo "Environment: $ENVIRONMENT"
-
-      # - name: Process Numeric Input
-      #   run: |
-      #     EXECUTION_COUNT=${{ github.event.inputs.execution-count || '1' }}
-      #     echo "Numeric input as string: $EXECUTION_COUNT"
-      #     echo "Converting EXECUTION_COUNT to number and performing calculation..."
-      #     NEW_COUNT=$((EXECUTION_COUNT + 1))
-      #     echo "New count: $NEW_COUNT"
-
-      # - name: Test
-      #   run: |
-      #     echo $NEW_COUNT
-
-      # - name: Run tests
-      #   if: ${{ github.event.inputs.run-tests }}
-      #   run: echo "Running tests because 'run-tests' is true!"
