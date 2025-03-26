@@ -1,3 +1,4 @@
+require "sorbet-runtime"
 require "dependabot/github_actions"
 require "dependabot/file_fetchers"
 require "dependabot/file_parsers"

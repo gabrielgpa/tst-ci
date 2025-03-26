@@ -63,9 +63,6 @@ jobs:
       - name: Install Gemfile dependencies
         run: bundle install
 
-      - name: Install sorbet-runtime (required by dependabot)
-        run: gem install sorbet-runtime
-
       - name: Run dynamic dependabot
         run: |
           bundle exec ruby .github/run_dependabot.rb
