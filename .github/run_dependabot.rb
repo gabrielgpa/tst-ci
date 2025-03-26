@@ -6,8 +6,8 @@ require "dependabot/file_updaters"
 require "dependabot/pull_request_creator"
 require "dependabot/source"
 
-respo_name = ENV["repo_source"]
-respo_branch = ENV["branch_source"]
+repo_name = ENV["repo_source"]
+repo_branch = ENV["branch_source"]
 
 source = Dependabot::Source.new(
   provider: "github",
@@ -50,23 +50,17 @@ if dependencies.respond_to?(:each)
     end
 
     puts "Checker for #{ dep.name }"
-    checker = Dependabot:: UpdateCheckers.for_package_manager(package_manager).new(
+    checker = Dependabot::UpdateCheckers.for_package_manager(package_manager).new(
       dependency: dep,
       dependency_files: files,
       credentials: credentials 
     )
 
-    if checker.respond_to?(:updatable?)
-      next unless checker.updatable?
-    elsif checker.respond_to?(:can_update?)
-      can_update = checker.can_update?(requirements_to_unlock: :own)
-      next unless can_update
-    else
-      puts "Checker not found"
-    end
+    can_update = checker.respond_to?(:updatable?) ? checker.updatable? : checker.can_update?(requirements_to_unlock: :own)
+    next unless can_update
 
     puts "Check update dependencies for #{ dep.name }"
-    update_files = Dependabot::FileUpadaters.for_package_manager(package_manager).new(
+    update_files = Dependabot::FileUpdaters.for_package_manager(package_manager).new(
       dependencies: [dep],
       dependency_files: files,
       credentials: credentials
@@ -81,12 +75,7 @@ if dependencies.respond_to?(:each)
       credentials: credentials,
       pr_message: "Bump #{ dep.name } to #{ dep.version }"
     ).create
-
   end
 else
   puts "No dependencies found"
 end
-
-
-
-  
